@@ -22,3 +22,4 @@ dependencies:
       - trimesh==4.3.2
       - plyfile
       - opencv-python
+      - numpy==1.26.4
