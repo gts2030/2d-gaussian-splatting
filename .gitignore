@@ -12,3 +12,9 @@ data
 eval
 *.npz
 **/tmp
+
+# Python package metadata (auto-generated)
+*.egg-info/
+.venv/
+dist/
+build/

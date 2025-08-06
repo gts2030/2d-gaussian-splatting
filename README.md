@@ -38,12 +38,47 @@ Firstly open the viewer,
 and then
 ```shell
 # Monitor the training process
-python train.py -s <path to COLMAP or NeRF Synthetic dataset> 
+# UV users
+uv run python train.py -s <path to COLMAP or NeRF Synthetic dataset>
+# Conda users  
+python train.py -s <path to COLMAP or NeRF Synthetic dataset>
+
 # View the trained model
-python view.py -s <path to COLMAP or NeRF Synthetic dataset> -m <path to trained model> 
+# UV users
+uv run python view.py -s <path to COLMAP or NeRF Synthetic dataset> -m <path to trained model>
+# Conda users
+python view.py -s <path to COLMAP or NeRF Synthetic dataset> -m <path to trained model>
 ```
 
 ## Installation
+
+We provide two installation methods: **uv** (recommended for speed) and **conda** (legacy support).
+
+### Option 1: UV Installation (Recommended) ⚡
+
+UV provides faster package management and modern Python project handling.
+
+```bash
+# download
+git clone https://github.com/gts2030/2d-gaussian-splatting.git --recursive
+cd 2d-gaussian-splatting
+
+# install uv if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# or: pip install uv
+
+# create environment and install dependencies
+uv python install 3.9
+uv venv --python 3.9
+uv sync
+
+# build submodules
+cd submodules/simple-knn && uv run python setup.py build_ext --inplace
+cd ../diff-surfel-rasterization && uv run python setup.py build_ext --inplace
+cd ../../
+```
+
+### Option 2: Conda Installation (Legacy)
 
 ```bash
 # download
@@ -56,50 +91,116 @@ conda activate 2dgs
 pip install ./submodules/diff-surfel-rasterization
 pip install ./submodules/simple-knn
 ```
-## Training
-To train a scene, simply use
+
+### Verify Installation
+
+Test your installation with:
+
 ```bash
+# For UV users
+uv run python -c "from scene.gaussian_model import GaussianModel; print('✅ Installation successful!')"
+
+# For Conda users  
+python -c "from scene.gaussian_model import GaussianModel; print('✅ Installation successful!')"
+```
+## Training
+To train a scene, simply use:
+
+```bash
+# UV users
+uv run python train.py -s <path to COLMAP or NeRF Synthetic dataset>
+
+# Conda users
 python train.py -s <path to COLMAP or NeRF Synthetic dataset>
 ```
-Commandline arguments for regularizations
+
+Commandline arguments for regularizations:
 ```bash
---lambda_normal  # hyperparameter for normal consistency
+--lambda_normal     # hyperparameter for normal consistency
 --lambda_distortion # hyperparameter for depth distortion
---depth_ratio # 0 for mean depth and 1 for median depth, 0 works for most cases
+--depth_ratio       # 0 for mean depth and 1 for median depth, 0 works for most cases
 ```
 **Tips for adjusting the parameters on your own dataset:**
 - For unbounded/large scenes, we suggest using mean depth, i.e., ``depth_ratio=0``,  for less "disk-aliasing" artifacts.
 
+## Troubleshooting
+
+### UV Environment Issues
+
+If you encounter `ModuleNotFoundError: No module named 'simple_knn'` when using UV:
+
+```bash
+# Add submodule paths to Python path
+echo "$(pwd)/submodules/simple-knn" > .venv/lib/python3.9/site-packages/simple-knn.pth
+echo "$(pwd)/submodules/diff-surfel-rasterization" > .venv/lib/python3.9/site-packages/diff-surfel-rasterization.pth
+
+# Verify installation
+uv run python -c "import simple_knn; import diff_surfel_rasterization; print('✅ Submodules working!')"
+```
+
+### Common Issues
+- **Large images warning**: The system automatically rescales images >1.6K pixels. Use `--resolution/-r` to override.
+- **CUDA out of memory**: Reduce batch size or use smaller resolution with `-r 2` or `-r 4`.
+
 ## Testing
 ### Bounded Mesh Extraction
-To export a mesh within a bounded volume, simply use
+To export a mesh within a bounded volume, simply use:
+
 ```bash
+# UV users
+uv run python render.py -m <path to pre-trained model> -s <path to COLMAP dataset>
+
+# Conda users
 python render.py -m <path to pre-trained model> -s <path to COLMAP dataset> 
 ```
-Commandline arguments you should adjust accordingly for meshing for bounded TSDF fusion, use
+
+Commandline arguments you should adjust accordingly for meshing for bounded TSDF fusion:
 ```bash
 --depth_ratio # 0 for mean depth and 1 for median depth
---voxel_size # voxel size
+--voxel_size  # voxel size
 --depth_trunc # depth truncation
 ```
 If these arguments are not specified, the script will automatically estimate them using the camera information.
+
 ### Unbounded Mesh Extraction
-To export a mesh with an arbitrary size, we devised an unbounded TSDF fusion with space contraction and adaptive truncation.
+To export a mesh with an arbitrary size, we devised an unbounded TSDF fusion with space contraction and adaptive truncation:
+
 ```bash
+# UV users
+uv run python render.py -m <path to pre-trained model> -s <path to COLMAP dataset> --mesh_res 1024
+
+# Conda users
 python render.py -m <path to pre-trained model> -s <path to COLMAP dataset> --mesh_res 1024
 ```
 
 ## Quick Examples
-Assuming you have downloaded [MipNeRF360](https://jonbarron.info/mipnerf360/), simply use
+
+### MipNeRF360 Dataset
+Assuming you have downloaded [MipNeRF360](https://jonbarron.info/mipnerf360/):
+
 ```bash
-python train.py -s <path to m360>/<garden> -m output/m360/garden
+# UV users
+uv run python train.py -s <path to m360>/<garden> -m output/m360/garden
 # use our unbounded mesh extraction!!
+uv run python render.py -s <path to m360>/<garden> -m output/m360/garden --unbounded --skip_test --skip_train --mesh_res 1024
+# or use the bounded mesh extraction if you focus on foreground  
+uv run python render.py -s <path to m360>/<garden> -m output/m360/garden --skip_test --skip_train --mesh_res 1024
+
+# Conda users
+python train.py -s <path to m360>/<garden> -m output/m360/garden
 python render.py -s <path to m360>/<garden> -m output/m360/garden --unbounded --skip_test --skip_train --mesh_res 1024
-# or use the bounded mesh extraction if you focus on foreground
 python render.py -s <path to m360>/<garden> -m output/m360/garden --skip_test --skip_train --mesh_res 1024
 ```
-If you have downloaded the [DTU dataset](https://drive.google.com/drive/folders/1SJFgt8qhQomHX55Q4xSvYE2C6-8tFll9), you can use
+
+### DTU Dataset
+If you have downloaded the [DTU dataset](https://drive.google.com/drive/folders/1SJFgt8qhQomHX55Q4xSvYE2C6-8tFll9):
+
 ```bash
+# UV users
+uv run python train.py -s <path to dtu>/<scan105> -m output/date/scan105 -r 2 --depth_ratio 1
+uv run python render.py -r 2 --depth_ratio 1 --skip_test --skip_train
+
+# Conda users
 python train.py -s <path to dtu>/<scan105> -m output/date/scan105 -r 2 --depth_ratio 1
 python render.py -r 2 --depth_ratio 1 --skip_test --skip_train
 ```
@@ -123,15 +224,26 @@ You can report either the numbers from the paper or from this implementation, as
 </details>
 
 #### Novel View Synthesis
-For novel view synthesis on [MipNeRF360](https://jonbarron.info/mipnerf360/) (which also works for other colmap datasets), use
+For novel view synthesis on [MipNeRF360](https://jonbarron.info/mipnerf360/) (which also works for other colmap datasets):
+
 ```bash
+# UV users
+uv run python scripts/m360_eval.py -m60 <path to the MipNeRF360 dataset>
+
+# Conda users
 python scripts/m360_eval.py -m60 <path to the MipNeRF360 dataset>
 ```
 
 #### Geometry reconstruction
 For geometry reconstruction on DTU dataset, please download the preprocessed data from [Drive](https://drive.google.com/drive/folders/1SJFgt8qhQomHX55Q4xSvYE2C6-8tFll9) or [Hugging Face](https://huggingface.co/datasets/dylanebert/2DGS). You also need to download the ground truth [DTU point cloud](https://roboimagedata.compute.dtu.dk/?page_id=36). 
+
 ```bash
-python scripts/dtu_eval.py --dtu <path to the preprocessed DTU dataset>   \
+# UV users
+uv run python scripts/dtu_eval.py --dtu <path to the preprocessed DTU dataset> \
+     --DTU_Official <path to the official DTU dataset>
+
+# Conda users
+python scripts/dtu_eval.py --dtu <path to the preprocessed DTU dataset> \
      --DTU_Official <path to the official DTU dataset>
 ```
 We provide <a> Evaluation Results (Pretrained, Meshes)</a>. 
@@ -152,12 +264,20 @@ For geometry reconstruction on TnT dataset, please download the preprocessed [Tn
 > Due to historical issue, you should use open3d==0.10.0 for evaluating TNT.
 
 ```bash
-# use open3d 0.18.0, skip metrics
-python scripts/tnt_eval.py --TNT_data <path to the preprocessed TNT dataset>   \
+# UV users (use open3d 0.18.0, skip metrics)
+uv run python scripts/tnt_eval.py --TNT_data <path to the preprocessed TNT dataset> \
      --TNT_GT <path to the official TNT evaluation dataset> --skip_metrics
 
-# use open3d 0.10.0, skip traing and rendering
-python scripts/tnt_eval.py --TNT_data <path to the preprocessed TNT dataset>   \
+# UV users (use open3d 0.10.0, skip training and rendering)
+uv run python scripts/tnt_eval.py --TNT_data <path to the preprocessed TNT dataset> \
+     --TNT_GT <path to the official TNT evaluation dataset> --skip_training --skip_rendering
+
+# Conda users (use open3d 0.18.0, skip metrics)
+python scripts/tnt_eval.py --TNT_data <path to the preprocessed TNT dataset> \
+     --TNT_GT <path to the official TNT evaluation dataset> --skip_metrics
+
+# Conda users (use open3d 0.10.0, skip training and rendering)
+python scripts/tnt_eval.py --TNT_data <path to the preprocessed TNT dataset> \
      --TNT_GT <path to the official TNT evaluation dataset> --skip_training --skip_rendering
 ```
 <details>

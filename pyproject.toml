@@ -1,0 +1,112 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "2d-gaussian-splatting"
+version = "0.1.0"
+description = "2D Gaussian Splatting for Geometrically Accurate Radiance Fields"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Gaussian-Splatting License"}
+authors = [
+    {name = "Binbin Huang", email = "huangbb@stu.xmu.edu.cn"},
+]
+keywords = ["gaussian-splatting", "neural-rendering", "3d-reconstruction"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research", 
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    # Core ML frameworks
+    "torch==2.7.0",
+    "torchvision==0.22.0", 
+    "torchaudio==2.7.0",
+    
+    # 3D processing
+    "open3d==0.19.0",
+    "trimesh==4.3.2",
+    "plyfile==1.1",
+    
+    # Computer vision
+    "opencv-python==4.11.0.86",
+    "scikit-image==0.24.0",
+    "lpips==0.1.4",
+    
+    # Scientific computing
+    "numpy==1.26.4",
+    "scipy==1.13.1",
+    "matplotlib==3.9.4",
+    "scikit-learn==1.6.1",
+    "pandas==2.2.3",
+    
+    # Utilities
+    "tqdm==4.67.1",
+    "pillow==10.2.0",
+    "PyYAML==6.0.2",
+    "configargparse==1.7",
+    "mediapy==1.1.2",
+    
+    # Development
+    "tensorboard==2.19.0",
+    "ipython==8.18.1",
+    "jupyter_core==5.7.2",
+    
+    # Additional dependencies from conda env
+    "pyquaternion==0.9.9",
+    "plotly==6.0.1",
+    "dash==3.0.4",
+    
+    # Local submodules (will be installed separately)
+    # "diff-surfel-rasterization @ file:./submodules/diff-surfel-rasterization",
+    # "simple-knn @ file:./submodules/simple-knn",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+    "flake8",
+]
+
+cuda = [
+    # CUDA-specific packages will be handled by torch index
+]
+
+[project.urls]
+Homepage = "https://github.com/hbb1/2d-gaussian-splatting"
+Repository = "https://github.com/hbb1/2d-gaussian-splatting"
+Documentation = "https://surfsplatting.github.io"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = ["tests*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+# UV specific configuration
+[tool.uv]
+index-url = "https://pypi.org/simple"
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
+torchaudio = { index = "pytorch" }
