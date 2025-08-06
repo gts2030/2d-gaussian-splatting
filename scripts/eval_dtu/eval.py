@@ -2,7 +2,7 @@
 import numpy as np
 import open3d as o3d
 import sklearn.neighbors as skln
-from tqdm import tqdm
+from alive_progress import alive_bar
 from scipy.io import loadmat
 import multiprocessing as mp
 import argparse

@@ -17,7 +17,7 @@ import torchvision.transforms.functional as tf
 from utils.loss_utils import ssim
 from lpipsPyTorch import lpips
 import json
-from tqdm import tqdm
+from alive_progress import alive_it
 from utils.image_utils import psnr
 from argparse import ArgumentParser
 
@@ -67,7 +67,7 @@ def evaluate(model_paths):
                 psnrs = []
                 lpipss = []
 
-                for idx in tqdm(range(len(renders)), desc="Metric evaluation progress"):
+                for idx in alive_it(range(len(renders)), title="📊 Evaluating metrics", spinner="triangles"):
                     ssims.append(ssim(renders[idx], gts[idx]))
                     psnrs.append(psnr(renders[idx], gts[idx]))
                     lpipss.append(lpips(renders[idx], gts[idx], net_type='vgg'))

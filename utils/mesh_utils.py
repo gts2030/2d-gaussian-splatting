@@ -13,7 +13,7 @@ import torch
 import numpy as np
 import os
 import math
-from tqdm import tqdm
+from alive_progress import alive_it
 from utils.render_utils import save_img_f32, save_img_u8
 from functools import partial
 import open3d as o3d
@@ -103,7 +103,7 @@ class GaussianExtractor(object):
         """
         self.clean()
         self.viewpoint_stack = viewpoint_stack
-        for i, viewpoint_cam in tqdm(enumerate(self.viewpoint_stack), desc="reconstruct radiance fields"):
+        for i, viewpoint_cam in alive_it(enumerate(self.viewpoint_stack), title="🎨 Reconstructing radiance fields", spinner="flowers"):
             render_pkg = self.render(viewpoint_cam, self.gaussians)
             rgb = render_pkg['render']
             alpha = render_pkg['rend_alpha']
@@ -159,7 +159,7 @@ class GaussianExtractor(object):
             color_type=o3d.pipelines.integration.TSDFVolumeColorType.RGB8
         )
 
-        for i, cam_o3d in tqdm(enumerate(to_cam_open3d(self.viewpoint_stack)), desc="TSDF integration progress"):
+        for i, cam_o3d in alive_it(enumerate(to_cam_open3d(self.viewpoint_stack)), title="🔄 TSDF integration progress", spinner="horizontal"):
             rgb = self.rgbmaps[i]
             depth = self.depthmaps[i]
             
@@ -224,7 +224,7 @@ class GaussianExtractor(object):
             rgbs = torch.zeros((samples.shape[0], 3)).cuda()
 
             weights = torch.ones_like(samples[:,0])
-            for i, viewpoint_cam in tqdm(enumerate(self.viewpoint_stack), desc="TSDF integration progress"):
+            for i, viewpoint_cam in alive_it(enumerate(self.viewpoint_stack), title="⚡ TSDF integration progress", spinner="pulse"):
                 sdf, rgb, mask_proj = compute_sdf_perframe(i, samples,
                     depthmap = self.depthmaps[i],
                     rgbmap = self.rgbmaps[i],
@@ -286,7 +286,7 @@ class GaussianExtractor(object):
         os.makedirs(render_path, exist_ok=True)
         os.makedirs(vis_path, exist_ok=True)
         os.makedirs(gts_path, exist_ok=True)
-        for idx, viewpoint_cam in tqdm(enumerate(self.viewpoint_stack), desc="export images"):
+        for idx, viewpoint_cam in alive_it(enumerate(self.viewpoint_stack), title="📸 Exporting images", spinner="dots_waves"):
             gt = viewpoint_cam.original_image[0:3, :, :]
             save_img_u8(gt.permute(1,2,0).cpu().numpy(), os.path.join(gts_path, '{0:05d}'.format(idx) + ".png"))
             save_img_u8(self.rgbmaps[idx].permute(1,2,0).cpu().numpy(), os.path.join(render_path, '{0:05d}'.format(idx) + ".png"))

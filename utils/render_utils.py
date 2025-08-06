@@ -21,7 +21,7 @@ import copy
 from PIL import Image
 import mediapy as media
 from matplotlib import cm
-from tqdm import tqdm
+from alive_progress import alive_it
 
 import torch
 
@@ -246,7 +246,7 @@ def create_videos(base_dir, input_dir, out_name, num_frames=480):
     print(f'Making video {video_file}...')
     with media.VideoWriter(
         video_file, **video_kwargs, input_format=input_format) as writer:
-      for idx in tqdm(range(num_frames)):
+      for idx in alive_it(range(num_frames), title="🎬 Rendering frames", spinner="vertical"):
         # img_file = os.path.join(input_dir, f'{k}_{idx_to_str(idx)}.{file_ext}')
         if k == 'color':
           img_file = os.path.join(input_dir, 'renders', f'{idx_to_str(idx)}.{file_ext}')

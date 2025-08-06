@@ -14,7 +14,7 @@ import subprocess
 
 import sys
 import render_utils as rend_util
-from tqdm import tqdm
+from alive_progress import alive_it
 
 def cull_scan(scan, mesh_path, result_mesh_file, instance_dir):
     
@@ -61,7 +61,7 @@ def cull_scan(scan, mesh_path, result_mesh_file, instance_dir):
     vertices = vertices.float()
 
     sampled_masks = []
-    for i in tqdm(range(n_images),  desc="Culling mesh given masks"):
+    for i in alive_it(range(n_images), title="✂️ Culling mesh with masks", spinner="arrows2"):
         pose = pose_all[i]
         w2c = torch.inverse(pose).cuda()
         intrinsic = intrinsics_all[i].cuda()

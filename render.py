@@ -12,7 +12,7 @@
 import torch
 from scene import Scene
 import os
-from tqdm import tqdm
+
 from os import makedirs
 from gaussian_renderer import render
 import torchvision

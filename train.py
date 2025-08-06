@@ -18,7 +18,7 @@ import sys
 from scene import Scene, GaussianModel
 from utils.general_utils import safe_state
 import uuid
-from tqdm import tqdm
+from alive_progress import alive_bar
 from utils.image_utils import psnr, render_net_image
 from argparse import ArgumentParser, Namespace
 from arguments import ModelParams, PipelineParams, OptimizationParams
@@ -49,9 +49,12 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
     ema_dist_for_log = 0.0
     ema_normal_for_log = 0.0
 
-    progress_bar = tqdm(range(first_iter, opt.iterations), desc="Training progress")
     first_iter += 1
-    for iteration in range(first_iter, opt.iterations + 1):        
+    total_iterations = opt.iterations - first_iter + 1
+    
+    with alive_bar(total_iterations, title="🚀 Training 2D Gaussian Splatting", 
+                   unit=" iters", enrich_print=False, spinner="waves") as bar:
+        for iteration in range(first_iter, opt.iterations + 1):        
 
         iter_start.record()
 
@@ -99,17 +102,10 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
 
 
             if iteration % 10 == 0:
-                loss_dict = {
-                    "Loss": f"{ema_loss_for_log:.{5}f}",
-                    "distort": f"{ema_dist_for_log:.{5}f}",
-                    "normal": f"{ema_normal_for_log:.{5}f}",
-                    "Points": f"{len(gaussians.get_xyz)}"
-                }
-                progress_bar.set_postfix(loss_dict)
-
-                progress_bar.update(10)
-            if iteration == opt.iterations:
-                progress_bar.close()
+                # Update progress bar with beautiful loss information
+                loss_text = f"Loss: {ema_loss_for_log:.5f} | Distort: {ema_dist_for_log:.5f} | Normal: {ema_normal_for_log:.5f} | Points: {len(gaussians.get_xyz)}"
+                bar.text = loss_text
+                bar(10)  # Advance by 10 iterations
 
             # Log and save
             if tb_writer is not None:

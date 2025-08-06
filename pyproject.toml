@@ -25,46 +25,39 @@ classifiers = [
 dependencies = [
     # Core ML frameworks
     "torch==2.7.0",
-    "torchvision==0.22.0", 
+    "torchvision==0.22.0",
     "torchaudio==2.7.0",
-    
     # 3D processing
     "open3d==0.19.0",
     "trimesh==4.3.2",
     "plyfile==1.1",
-    
     # Computer vision
     "opencv-python==4.11.0.86",
     "scikit-image==0.24.0",
     "lpips==0.1.4",
-    
     # Scientific computing
     "numpy==1.26.4",
     "scipy==1.13.1",
     "matplotlib==3.9.4",
     "scikit-learn==1.6.1",
     "pandas==2.2.3",
-    
     # Utilities
-    "tqdm==4.67.1",
     "pillow==10.2.0",
     "PyYAML==6.0.2",
     "configargparse==1.7",
     "mediapy==1.1.2",
-    
     # Development
     "tensorboard==2.19.0",
     "ipython==8.18.1",
     "jupyter_core==5.7.2",
-    
     # Additional dependencies from conda env
     "pyquaternion==0.9.9",
     "plotly==6.0.1",
     "dash==3.0.4",
-    
     # Local submodules (will be installed separately)
     # "diff-surfel-rasterization @ file:./submodules/diff-surfel-rasterization",
     # "simple-knn @ file:./submodules/simple-knn",
+    "alive-progress>=3.3.0",
 ]
 
 [project.optional-dependencies]
