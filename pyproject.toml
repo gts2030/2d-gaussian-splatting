@@ -46,8 +46,9 @@ dependencies = [
     "PyYAML==6.0.2",
     "configargparse==1.7",
     "mediapy==1.1.2",
-    # Development
+    # Development and Monitoring
     "tensorboard==2.19.0",
+    "wandb",  # For experiment tracking and visualization
     "ipython==8.18.1",
     "jupyter_core==5.7.2",
     # Additional dependencies from conda env
@@ -58,6 +59,7 @@ dependencies = [
     # "diff-surfel-rasterization @ file:./submodules/diff-surfel-rasterization",
     # "simple-knn @ file:./submodules/simple-knn",
     "alive-progress>=3.3.0",
+    "wandb>=0.21.0",
 ]
 
 [project.optional-dependencies]

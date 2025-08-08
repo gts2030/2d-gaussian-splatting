@@ -124,6 +124,14 @@ def safe_state(silent):
 
         def flush(self):
             old_f.flush()
+        
+        def fileno(self):
+            # Fix for alive_progress compatibility
+            return old_f.fileno() if hasattr(old_f, 'fileno') else 1
+        
+        def isatty(self):
+            # Fix for terminal detection
+            return old_f.isatty() if hasattr(old_f, 'isatty') else False
 
     sys.stdout = F(silent)
 

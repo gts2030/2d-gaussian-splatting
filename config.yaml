@@ -1,0 +1,64 @@
+# 2D Gaussian Splatting Configuration
+# This file contains all training and model parameters
+
+# Dataset parameters
+dataset:
+  source_path: ""  # Will be set via command line argument
+  model_path: ""   # Will be set automatically if not specified
+  images: "images"
+  resolution: -1
+  white_background: false
+  data_device: "cuda"
+  eval: false
+  sh_degree: 3
+  render_items: ["RGB", "Alpha", "Normal", "Depth", "Edge", "Curvature"]
+
+# Optimization parameters
+optimization:
+  iterations: 50000
+  position_lr_init: 0.00016
+  position_lr_final: 0.0000016
+  position_lr_delay_mult: 0.01
+  position_lr_max_steps: 30000
+  feature_lr: 0.0025
+  opacity_lr: 0.05
+  scaling_lr: 0.005
+  rotation_lr: 0.001
+  percent_dense: 0.01
+  lambda_dssim: 0.2
+  lambda_normal: 0.05
+  lambda_dist: 0.0
+  densification_interval: 100
+  opacity_reset_interval: 3000
+  densify_from_iter: 500
+  densify_until_iter: 15000
+  densify_grad_threshold: 0.0002
+  opacity_cull: 0.005
+
+# Pipeline parameters
+pipeline:
+  convert_SHs_python: false
+  compute_cov3D_python: false
+  depth_ratio: 0.0
+  debug: false
+
+# Training control
+training:
+  test_iterations: [7000, 30000]
+  save_iterations: [7000, 30000]
+  checkpoint_iterations: []
+  start_checkpoint: null
+  detect_anomaly: false
+  quiet: false
+
+# Network GUI
+gui:
+  ip: "127.0.0.1"
+  port: 6009
+
+# W&B logging
+wandb:
+  enabled: true  # Disabled by default to avoid permission issues
+  project: "2d-gaussian-splatting"
+  entity: null  # Use personal account by default, set to organization name if needed
+  run_name: null  # Will be auto-generated if null

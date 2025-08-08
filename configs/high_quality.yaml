@@ -1,0 +1,58 @@
+# High quality configuration - for best results
+# Extended iterations and optimized settings
+
+dataset:
+  source_path: ""  # Set via command line
+  model_path: ""   # Auto-generated
+  images: "images"
+  resolution: -1
+  white_background: false
+  data_device: "cuda"
+  eval: false
+  sh_degree: 3
+  render_items: ["RGB", "Alpha", "Normal", "Depth", "Edge", "Curvature"]
+
+optimization:
+  iterations: 50000  # Extended for higher quality
+  position_lr_init: 0.00016
+  position_lr_final: 0.0000016
+  position_lr_delay_mult: 0.01
+  position_lr_max_steps: 50000
+  feature_lr: 0.0025
+  opacity_lr: 0.05
+  scaling_lr: 0.001
+  rotation_lr: 0.001
+  percent_dense: 0.01
+  lambda_dssim: 0.2
+  lambda_normal: 0.1  # Increased for better surface quality
+  lambda_dist: 0.005  # Added distortion regularization
+  densification_interval: 100
+  opacity_reset_interval: 3000
+  densify_from_iter: 500
+  densify_until_iter: 25000  # Extended densification
+  densify_grad_threshold: 0.0002
+  opacity_cull: 0.005
+
+pipeline:
+  convert_SHs_python: false
+  compute_cov3D_python: false
+  depth_ratio: 0.0
+  debug: false
+
+training:
+  test_iterations: [7000, 15000, 30000, 50000]
+  save_iterations: [7000, 15000, 30000, 50000]
+  checkpoint_iterations: [15000, 30000]
+  start_checkpoint: null
+  detect_anomaly: false
+  quiet: false
+
+gui:
+  ip: "127.0.0.1"
+  port: 6009
+
+wandb:
+  enabled: true
+  project: "2dgs-high-quality"
+  entity: null  # Use personal account by default
+  run_name: null
